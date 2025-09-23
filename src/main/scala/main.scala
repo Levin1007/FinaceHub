@@ -1,19 +1,19 @@
 import scala.io.StdIn
+
 @main
 def main(): Unit = {
-
-  //Input Values
   print("Gebe dein Startkapital an: ")
-  val startKapital = StdIn.readLine().toInt
-  print("Gebe deinen Zinssatz an:")
-  val zinsSatz = StdIn.readLine().toInt
-  print("Gebe Laufzeit in Monaten an:")
+  val startKapital = StdIn.readLine().toDouble
+  print("Gebe deinen Zinssatz an (in %): ")
+  val zinsSatz = StdIn.readLine().toDouble
+  print("Gebe Laufzeit in Monaten an: ")
   val duration = StdIn.readLine().toInt
 
-  // Output Values
-  // todo calculate final capital
-  println(s"Startkapital: $startKapital")
-  println(s"Zinssatz: $zinsSatz" )
-  println(s"Laufzeit: $duration")
-}
+  val finance = new FinanceTools(startKapital, zinsSatz, duration)
+  val capitals = finance.calculateMonthlyCapitalsSimpleInterest()
 
+  println(f"Startkapital: $startKapital%.2f")
+  capitals.zipWithIndex.foreach { case (capital, month) =>
+    println(f"Monat ${month + 1}: Kapital = $capital%.2f")
+  }
+}
