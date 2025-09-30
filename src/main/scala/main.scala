@@ -1,7 +1,10 @@
+import java.sql.{ResultSet, SQLException, Statement}
 import scala.io.StdIn
 
 @main
 def main(): Unit = {
+  ExampleDbConnection.testDb()
+  
   println("=== Finanzplan-Rechner ===")
 
   print("Startkapital: ")
