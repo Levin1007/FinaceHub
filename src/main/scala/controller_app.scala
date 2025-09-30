@@ -8,6 +8,7 @@ import java.sql.Connection
 class AppController(connection: Connection) {
   private val userRepo = new UserRepository(connection)
   private val sessionRepo = new SessionRepository()
+  private val renditeController = new RenditeController()
 
   def start(): Unit = {
     ConsoleUI.printHeader()
@@ -50,7 +51,7 @@ class AppController(connection: Connection) {
     val password = ConsoleUI.readString("Passwort: ")
 
     val hashedPassword = AuthService.hashPassword(password)
-    
+
     userRepo.findByUsernameAndPassword(username, hashedPassword) match {
       case Some(user) =>
         ConsoleUI.printSuccess(s"Login erfolgreich! Willkommen zurück, ${user.name}!")
@@ -68,6 +69,10 @@ class AppController(connection: Connection) {
     val username = ConsoleUI.readString("Benutzername: ")
     val password = ConsoleUI.readString("Passwort: ")
     val passwordConfirm = ConsoleUI.readString("Passwort bestätigen: ")
+    val balance = ConsoleUI.readString("Startkapital:") match {
+      case "" => "0.0"
+      case b => b
+    }
 
     if (password != passwordConfirm) {
       ConsoleUI.printError("Passwörter stimmen nicht überein!")
@@ -79,7 +84,7 @@ class AppController(connection: Connection) {
       ConsoleUI.printError("Benutzername existiert bereits!")
     } else {
       val hashedPassword = AuthService.hashPassword(password)
-      userRepo.create(username, hashedPassword) match {
+      userRepo.create(username, hashedPassword, balance) match {
         case Some(_) =>
           ConsoleUI.printSuccess(s"Benutzer '$username' erfolgreich registriert! Bitte logge dich jetzt ein.")
         case None =>
@@ -92,30 +97,47 @@ class AppController(connection: Connection) {
     var continue = true
 
     while (continue) {
+      // Menü anzeigen
       ConsoleUI.printMainMenu(user)
+
       val choice = ConsoleUI.readString("\nBitte wähle eine Option: ")
 
       choice match {
-        case "1" => handleFinanceCalculation()
-        case "2" => handleShowBalance(user)
-        case "3" =>
-          sessionRepo.clear()
+        case "1" => handleZinsberechnungMenu() // Zinsrechner
+        case "2" => handleRenditeRechner() // Renditenrechner
+        case "3" => handleShowBalance(user) // Kontostand anzeigen
+        case "4" =>
+          sessionRepo.clear() // Logout
           ConsoleUI.printSuccess("Erfolgreich ausgeloggt!")
           continue = false
-        case _ =>
-          ConsoleUI.printError("Ungültige Auswahl. Bitte versuche es erneut.")
+        case _ => ConsoleUI.printError("Ungültige Auswahl. Bitte versuche es erneut.")
       }
     }
   }
+
+  // Methoden zur Handhabung der Auswahlmöglichkeiten:
+
+  private def handleZinsberechnungMenu(): Unit = {
+    println("\n=== ZINSRECHNER ===")
+    // Zinsrechner-Logik hier
+    handleFinanceCalculation()
+  }
+
+  private def handleRenditeRechner(): Unit = {
+    println("\n=== RENDITENRECHNER ===")
+    // Renditenrechner-Logik hier
+    renditeController.start()
+  }
+
 
   private def handleFinanceCalculation(): Unit = {
     ConsoleUI.printFinanceHeader()
 
     val startKapital = ConsoleUI.readDouble("Startkapital: ")
     val monatlicheEinzahlung = ConsoleUI.readDouble("Monatliche Einzahlung: ")
-    val zinsSatzProJahr = ConsoleUI.readDouble("Zinssatz pro Jahr (z.B. 0.05 für 5 %): ")
+    val zinsSatzProJahr = ConsoleUI.readDouble("Zinssatz pro Jahr (z.B. 5 für 5 %): ").toDouble / 100.0
     val laufzeit = ConsoleUI.readInt("Laufzeit in Monaten: ")
-    val steuerSatz = ConsoleUI.readDouble("Steuersatz auf Zinserträge (z.B. 0.25 für 25 %): ")
+    val steuerSatz = ConsoleUI.readDouble("Steuersatz auf Zinserträge (z.B. 25 für 25 %): ").toDouble / 100.0
     val sonderZahlungen = ConsoleUI.readSonderzahlungen()
 
     val config = FinanzplanConfig(

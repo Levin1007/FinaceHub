@@ -21,9 +21,10 @@ object ConsoleUI {
     println(f"Aktuelles Guthaben: €${user.balance}%.2f")
     println("=" * 50)
     println("\n=== HAUPTMENÜ ===")
-    println("1. Zinsberechnung")
-    println("2. Kontostand anzeigen")
-    println("3. Logout")
+    println("1. Zinsrechner")
+    println("2. Renditenrechner")
+    println("3. Kontostand anzeigen")
+    println("4. Logout")
   }
 
   def printLoginMenu(): Unit = {
@@ -34,7 +35,7 @@ object ConsoleUI {
   }
 
   def printFinanceHeader(): Unit = {
-    println("\n=== Finanzplan-Rechner ===")
+    println("\n=== Finanzplan-Rechner (mit Steuern) ===")
   }
 
   def printFinancePlan(plan: List[MonatsStatus]): Unit = {
