@@ -24,7 +24,8 @@ object ConsoleUI {
     println("1. Zinsrechner")
     println("2. Renditenrechner")
     println("3. Kontostand anzeigen")
-    println("4. Logout")
+    println("4. Budget Planer")
+    println("5. Logout")
   }
 
   def printLoginMenu(): Unit = {

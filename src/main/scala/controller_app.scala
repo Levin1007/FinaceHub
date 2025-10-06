@@ -1,9 +1,13 @@
 package controller
 
-import model.{User, FinanzplanConfig, FinanceCalculator, AuthService}
-import repository.{UserRepository, SessionRepository}
-import ui.{ConsoleUI, ChartUI}
+import BudgetPlanner.{Budget, Transaction}
+import model.{AuthService, FinanceCalculator, FinanzplanConfig, User}
+import repository.{SessionRepository, UserRepository}
+import ui.{ChartUI, ConsoleUI}
+
 import java.sql.Connection
+import scala.io.StdIn.readLine
+import java.time.LocalDate
 
 class AppController(connection: Connection) {
   private val userRepo = new UserRepository(connection)
@@ -106,7 +110,8 @@ class AppController(connection: Connection) {
         case "1" => handleZinsberechnungMenu() // Zinsrechner
         case "2" => handleRenditeRechner() // Renditenrechner
         case "3" => handleShowBalance(user) // Kontostand anzeigen
-        case "4" =>
+        case "4" => handleBudgetPlanner() // Budget Planer
+        case "5" =>
           sessionRepo.clear() // Logout
           ConsoleUI.printSuccess("Erfolgreich ausgeloggt!")
           continue = false
@@ -160,5 +165,34 @@ class AppController(connection: Connection) {
   private def handleShowBalance(user: User): Unit = {
     ConsoleUI.printBalance(user)
     ConsoleUI.waitForEnter()
+  }
+  
+  private def handleBudgetPlanner(): Unit = {
+    println("\n=== BUDGET PLANER ===")
+    // Budget Planer-Logik hier
+    var budget = Budget(Nil)
+
+    var continue = true
+    while continue do
+      println("\nNeue Transaktion hinzufügen:")
+      val dateStr = readLine("Datum (YYYY-MM-DD): ")
+      val date = LocalDate.parse(dateStr)
+      val amount = BigDecimal(readLine("Betrag (positiv = Einnahme, negativ = Ausgabe): "))
+      val category = readLine("Kategorie: ")
+
+      budget = budget.add(Transaction(date, amount, category))
+
+      val more = readLine("Weitere Transaktion? (j/n): ").toLowerCase
+      if more != "j" then continue = false
+
+    println("\n=== Budget Übersicht ===")
+    println("Gesamtbetrag: " + budget.total + " €")
+    println(budget.balance)
+
+    println("\n=== Kategorien ===")
+    budget.totalByCategory.foreach { (cat, sum) =>
+      println(s"$cat: $sum €")
+    }
+
   }
 }
