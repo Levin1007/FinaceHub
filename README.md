@@ -1,7 +1,7 @@
 
 # FinanceHub
 
-FinanceHub is a desktop tool collection for financial calculations in Scala. The app offers various tools such as investment calculators, compound interest calculators, loan calculators, and budget planners.
+FinanceHub is a console tool collection for financial calculations in Scala. The app offers various tools such as investment calculators, compound interest calculators, loan calculators, and budget planners.
 
 
 
