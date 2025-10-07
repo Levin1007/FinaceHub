@@ -34,6 +34,7 @@ cd FinanceHub
 sbt update
 sbt compile
 ```
+⚠️ **Don't forget:** create the database and run `ddl.sql` before starting the app.
 
 Run
 ```bash
