@@ -68,20 +68,21 @@ class UserRepository(connection: Connection) {
     }
   }
 
-  def create(username: String, hashedPassword: String): Option[User] = {
+  def create(username: String, hashedPassword: String, balance: String): Option[User] = {
     try {
-      val query = "INSERT INTO users (name, password, balance) VALUES (?, ?, 0.0)"
+      val query = "INSERT INTO users (name, password, balance) VALUES (?, ?, ?)"
       val pstmt: PreparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
 
       pstmt.setString(1, username)
       pstmt.setString(2, hashedPassword)
+      pstmt.setString(3, balance)
       
       val result = pstmt.executeUpdate()
       
       val user = if (result > 0) {
         val keys = pstmt.getGeneratedKeys
         if (keys.next()) {
-          Some(User(keys.getInt(1), username, hashedPassword, 0.0))
+          Some(User(keys.getInt(1), username, hashedPassword, balance.toDouble))
         } else {
           None
         }
