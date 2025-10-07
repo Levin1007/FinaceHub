@@ -8,7 +8,10 @@ def main(): Unit = {
       try {
         val app = new AppController(connection)
         app.start()
-      } finally {
+      } catch {
+        case ex: Exception =>
+          println(s"Ein Fehler ist aufgetreten: ${ex.getMessage}")
+      }  finally {
         DBConnection.close(connection)
       }
       
